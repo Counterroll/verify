@@ -1,0 +1,48 @@
+{
+  "id": "att_1a47920b4d5e74e1b44d79284bfa9ad2",
+  "organizationId": "org_sample_verify",
+  "seq": "2",
+  "agentId": "agent_sample_buyer_verify",
+  "policyId": "policy_sample_verify",
+  "decision": "APPROVE",
+  "denyReasons": [],
+  "network": "eip155:84532",
+  "asset": "0x5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a",
+  "payTo": "0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+  "amount": "9000000",
+  "eip3009Nonce": "fa42e5d98a8727450b2a16244ae6c69b849df413fd8aa16024c8d782cb673dc5",
+  "payloadSha256": "2fbbba8129e1d939aa2a65b6497f93f14db9cae94684f4b0d1734cf3e322f680",
+  "requirements": {
+    "amount": "9000000",
+    "asset": "0x5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a",
+    "extra": {
+      "name": "Synthetic USD",
+      "version": "2"
+    },
+    "maxTimeoutSeconds": 60,
+    "network": "eip155:84532",
+    "payTo": "0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+    "scheme": "exact"
+  },
+  "policySnapshot": {
+    "allowedAssets": [
+      "0x5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a"
+    ],
+    "allowedNetworks": [
+      "eip155:84532"
+    ],
+    "id": "policy_sample_verify",
+    "payeeAllowlist": [
+      "0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1"
+    ],
+    "perTxCap": "5000000",
+    "windowCap": "20000000",
+    "windowSeconds": 86400
+  },
+  "attestationType": null,
+  "schemaVersion": null,
+  "prevHash": "fcf773e13191d5a99930c09fb6de7b2d370ba8e11f981793ef41cd38b933ec24",
+  "hash": "02c10e5c6530f1f671b12d26428046c13fce45fe698c4f3dc78f869ba31bdd5d",
+  "signature": "2580282f1933c93bcb711f2b024bdbac25a7d6f33a14ddbbd6e98b7b7710c5117b0ab27950630c850fe571265b2262ec3c4083e1659d7b51c58e5ba4ede5a60f",
+  "createdAt": "2026-11-15T15:01:00.000Z"
+}

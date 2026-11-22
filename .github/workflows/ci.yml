@@ -1,0 +1,21 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [18, 20, 22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: node --test test/*.test.mjs
+      - run: node bin/counterroll-verify.mjs examples/refusal-original.json --key ab0aba4ac25570cf8c0b27a729fb47923461c9f9be7c3e60a982857685f8586c
+      - run: "! node bin/counterroll-verify.mjs examples/refusal-edited.json --key ab0aba4ac25570cf8c0b27a729fb47923461c9f9be7c3e60a982857685f8586c"

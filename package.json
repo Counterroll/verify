@@ -1,0 +1,39 @@
+{
+  "name": "counterroll-verify",
+  "version": "0.1.0",
+  "description": "Free, offline verifier for Counterroll's signed decision records. Checks a record against a public key you trust. No dependencies.",
+  "type": "module",
+  "bin": {
+    "counterroll-verify": "bin/counterroll-verify.mjs"
+  },
+  "exports": {
+    ".": "./src/verify.mjs"
+  },
+  "files": [
+    "bin",
+    "src",
+    "examples",
+    "FORMAT.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "keywords": [
+    "x402",
+    "agent-payments",
+    "ed25519",
+    "verification"
+  ],
+  "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Counterroll/verify.git"
+  },
+  "homepage": "https://github.com/Counterroll/verify#readme"
+}

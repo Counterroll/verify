@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<title>Verify a record · Counterroll</title>
+<meta name="description" content="Free check of a Counterroll decision record: was it signed by the key you trust, and has it been changed since? Runs in your browser; nothing is uploaded.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%2305070A'/%3E%3Crect x='8' y='3' width='8' height='58' fill='%23F4F2EC'/%3E%3Crect x='48' y='3' width='8' height='58' fill='%23F4F2EC'/%3E%3Crect x='30' y='25' width='4' height='14' fill='%233157E8'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #0b0e11; --panel: #0d1117; --text: #c9d1d9; --muted: #8b949e; --faint: #58606a;
+    --rule: #21262d; --ok: #3fb950; --fix: #f85149; --accent: #d29922;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    font-size: 15px; line-height: 1.65;
+  }
+  main { max-width: 52rem; margin: 0 auto; padding: 2.5rem 1rem 4rem; }
+  a { color: var(--accent); }
+  h1 { font-size: 1.6rem; line-height: 1.3; color: #f0f6fc; margin-bottom: .5rem; }
+  h2 { font-size: 1rem; color: #f0f6fc; margin: 2.25rem 0 .75rem; }
+  p { margin-bottom: .9rem; }
+  .muted { color: var(--muted); }
+  .brand { color: var(--muted); font-size: .85rem; letter-spacing: .04em; margin-bottom: 1.5rem; display: block; text-decoration: none; }
+  .panel { border: 1px solid var(--rule); background: var(--panel); border-radius: 6px; padding: 1rem; margin: 1rem 0; }
+  label.field { display: block; color: var(--muted); font-size: .85rem; margin-bottom: .3rem; }
+  input[type=text], textarea {
+    width: 100%; font: inherit; font-size: .85rem; color: var(--text); background: #010409;
+    border: 1px solid var(--rule); border-radius: 6px; padding: .5rem .6rem;
+  }
+  textarea { min-height: 9rem; resize: vertical; }
+  .buttons { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: .9rem; }
+  button, label.btn {
+    font: inherit; font-size: .9rem; color: var(--text); background: #161b22; cursor: pointer;
+    border: 1px solid var(--rule); border-radius: 6px; padding: .45rem .9rem;
+  }
+  button:hover, label.btn:hover { border-color: var(--muted); }
+  label.btn input { display: none; }
+  .key { overflow-wrap: anywhere; color: #f0f6fc; }
+  .verdict { font-size: 1.25rem; font-weight: 700; margin-bottom: .5rem; }
+  .pass { color: var(--ok); } .fail { color: var(--fix); }
+  .row { display: grid; grid-template-columns: 7.5rem 1fr; gap: .1rem 1rem; }
+  .row > span:nth-child(odd) { color: var(--muted); }
+  .row > span { overflow-wrap: anywhere; }
+  .problem { color: var(--fix); overflow-wrap: anywhere; margin-top: .4rem; font-size: .85rem; }
+  ul { padding-left: 1.2rem; margin-bottom: .9rem; }
+  li { margin-bottom: .35rem; }
+  code { color: #f0f6fc; overflow-wrap: anywhere; }
+  pre { white-space: pre-wrap; overflow-wrap: anywhere; color: #f0f6fc; font-size: .85rem; }
+  footer { margin-top: 3rem; color: var(--faint); font-size: .8rem; }
+  [hidden] { display: none !important; }
+  @media (max-width: 30rem) { .row { grid-template-columns: 1fr; } .row > span:nth-child(even) { margin-bottom: .4rem; } }
+</style>
+</head>
+<body>
+<main>
+  <a class="brand" href="https://counterroll.dev">COUNTERROLL</a>
+  <h1>Verify a Counterroll record</h1>
+  <p>Check that a decision record was signed by the key you trust and has not been changed since. Free.</p>
+  <p class="muted">The check runs inside this page. Nothing is uploaded, and the page is not allowed to make network requests.</p>
+
+  <h2>What verification means</h2>
+  <p>Someone can check that a record came from Counterroll and wasn't edited, without having to ask us.</p>
+  <p>In the example below, an agent asks to spend 9.00 against a 5.00 cap. Counterroll records "DENY: over the cap" and signs it. Check it with the trusted public key and the original passes. Change "DENY" to "APPROVE" and the edited copy fails.</p>
+  <p>Think of it like a tamper-evident seal on a receipt. It proves what Counterroll recorded, not that the decision was correct or that money moved.</p>
+
+  <div class="panel">
+    <p style="margin-bottom:.5rem">Public key for the two examples (fictional organization <code>org_sample_verify</code>):</p>
+    <p class="key" id="example-key"></p>
+    <p class="muted" style="margin-bottom:0">The same key is printed in the README at <a href="https://github.com/Counterroll/verify" rel="noopener noreferrer">github.com/Counterroll/verify</a>. Compare the two.</p>
+    <div class="buttons">
+      <button type="button" id="try-original">Check the original refusal</button>
+      <button type="button" id="try-edited">Check the edited copy</button>
+    </div>
+  </div>
+
+  <section id="result" class="panel" hidden aria-live="polite"></section>
+
+  <h2>Check your own record</h2>
+  <div class="panel">
+    <label class="field" for="key">Public key you trust (64 hex characters). Get it from Counterroll by a separate route, never from the same place as the record.</label>
+    <input type="text" id="key" autocomplete="off" spellcheck="false" placeholder="e.g. ab0aba4a…">
+    <label class="field" for="record" style="margin-top:.9rem">Record: one JSON object, or a JSON array of an organization's records from seq 1</label>
+    <textarea id="record" spellcheck="false" placeholder='{ "id": "att_…", "decision": "DENY", … }'></textarea>
+    <div class="buttons">
+      <button type="button" id="check">Check</button>
+      <label class="btn">Open a file<input type="file" id="pick" accept=".json,application/json"></label>
+    </div>
+  </div>
+
+  <h2>What a pass proves</h2>
+  <ul>
+    <li>The record was signed by whoever holds the private half of the key you used.</li>
+    <li>None of the signed fields changed since: decision, reasons, amount, payee, agent, policy, time, and the link to the previous record.</li>
+    <li>For a list of records: they link up from record 1 as presented.</li>
+  </ul>
+  <h2>What it does not prove</h2>
+  <ul>
+    <li>That the key is Counterroll's. That depends on how you got it. A record re-signed with a made-up key passes against that made-up key.</li>
+    <li>That the decision was correct, or that any money moved or did not move.</li>
+    <li>That you have every record. A list with its newest records removed still links up.</li>
+    <li>Anything about requests that never got a signed record. Some refusals (an unknown agent, a malformed or repeated request) leave only an unsigned event or nothing.</li>
+  </ul>
+
+  <h2>Run it on the command line</h2>
+  <p>The same check, open source under the MIT licence, with no dependencies. With Node 18 or later:</p>
+  <pre>git clone https://github.com/Counterroll/verify
+cd verify
+node bin/counterroll-verify.mjs examples/refusal-original.json --key &lt;key&gt;</pre>
+  <p class="muted">The record format is published in <a href="https://github.com/Counterroll/verify/blob/main/FORMAT.md" rel="noopener noreferrer">FORMAT.md</a>. It is Counterroll's own format, not an industry standard.</p>
+
+  <h2>Verification is free. Evaluation is the paid part.</h2>
+  <p>Anyone can verify Counterroll records at no cost. If you want to know how Counterroll's policy checks would handle your own agent payment scenarios, we run them offline on synthetic data and give you the signed records, edited copies and a written report: <a href="mailto:hello@counterroll.dev?subject=Offline%20evaluation">hello@counterroll.dev</a>.</p>
+
+  <p class="muted">Not the <a href="/check/">x402 setup check</a>, which looks at your project's x402 settings.</p>
+
+  <footer>counterroll-verify <span id="tool-version"></span> by Counterroll. Written by Counterroll and not independently audited.</footer>
+</main>
+<script type="module" src="./app.mjs"></script>
+</body>
+</html>
